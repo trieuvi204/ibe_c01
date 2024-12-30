@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
+import re
+from fastapi import HTTPException
 
 # error response
 class ErrorResponse(BaseModel):
@@ -13,6 +15,17 @@ class RegisterUserRequest(BaseModel):
   fullname: str
   email: str
   password: str
+
+  # validate email using field validator
+  @field_validator("email")
+  def validate_email(cls, value: str) -> str:
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_regex, value):
+      raise HTTPException(422, detail="Invalid email format")
+    return value
+
+
+
 
 # Register user response
 class RegisterUserRespone(BaseModel):

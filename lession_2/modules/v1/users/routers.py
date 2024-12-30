@@ -6,7 +6,8 @@ router = APIRouter(prefix= "/v1/users", tags=["users"])
 
 # router user registration
 @router.post("/register" ,status_code = 201, response_model = schemas.RegisterUserRespone, responses = {
-  420: {"model": schemas.ErrorResponse, "description": "User email already exists"}
+  420: {"model": schemas.ErrorResponse, "description": "User email already exists"},
+  422: {"model": schemas.ErrorResponse, "description": "Invalid format"}
 }) 
 async def register(data: schemas.RegisterUserRequest):
   data = data.model_dump()
@@ -43,11 +44,14 @@ async def get_me(email: str):
 
 # router update me
 @router.put("/me", status_code=200, response_model=schemas.UpdateMeResponse, responses= {
-  423: {"model": schemas.ErrorResponse, "description": "Database is empty"}
+  423: {"model": schemas.ErrorResponse, "description": "Database is empty"},
+  421: {"model": schemas.ErrorResponse, "description": "User not found"},
+  422: {"model": schemas.ErrorResponse, "description": "Invalid format"},
+  427: {"model": schemas.ErrorResponse, "description": "Update failed"}
 })
-async def update_me(data: schemas.UpdateMeRequest):
+async def update_me(data: schemas.UpdateMeRequest, email: str):
   data = data.model_dump(exclude_none=True)
-  result = await services.update_me(data)
+  result = await services.update_me(data, email)
   return schemas.UpdateMeResponse(**result) 
 
 # router delete me

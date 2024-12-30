@@ -7,3 +7,4 @@ class Users(BaseModel):
   phone_number: Optional[str] = None
   password: str
 
+
